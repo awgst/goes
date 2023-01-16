@@ -122,6 +122,9 @@ func getGenerator(generated string, name string, packages string) error {
 	case "model":
 		var modelGenerator generator.Model
 		gen = &modelGenerator
+	case "controller":
+		var controllerGenerator generator.Controller
+		gen = &controllerGenerator
 	}
 
 	dir := defaultPath + packages
