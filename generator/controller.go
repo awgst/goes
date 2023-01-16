@@ -10,10 +10,10 @@ import (
 	"github.com/awgst/goes"
 )
 
-type Model struct {
+type Controller struct {
 }
 
-func (m *Model) Make(name string, dir string, packages string) error {
+func (c *Controller) Make(name string, dir string, packages string) error {
 	filename := fmt.Sprintf("%v.%v", goes.SnakeCase(name), "go")
 
 	os.Mkdir(dir, 0755)
@@ -33,7 +33,7 @@ func (m *Model) Make(name string, dir string, packages string) error {
 		CamelName: goes.CamelCase(name),
 	}
 
-	tmpl := m.getTemplate(name, packages)
+	tmpl := c.getTemplate(name, packages)
 	if err := tmpl.Execute(f, vars); err != nil {
 		return fmt.Errorf("Failed to execute tmpl: %w", err)
 	}
@@ -42,11 +42,41 @@ func (m *Model) Make(name string, dir string, packages string) error {
 	return nil
 }
 
-func (m *Model) getTemplate(name string, packages string) *template.Template {
+func (c *Controller) getTemplate(name string, packages string) *template.Template {
 	var parsed = fmt.Sprintf(`package %v
+
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type %v struct {
 }
-	`, packages, name)
+
+// Get resources list
+func (ctr *%v) Index(c *gin.Context) {
+
+}
+
+// Get resource by id
+func (ctr *%v) Show(c *gin.Context) {
+	id := c.Param("id")
+}
+
+// Create resource
+func (ctr *%v) Create(c *gin.Context) {
+
+}
+
+// UPdate resource
+func (ctr *%v) Update(c *gin.Context) {
+	id := c.Param("id")
+}
+
+// Create resource
+func (ctr *%v) Delete(c *gin.Context) {
+	id := c.Param("id")
+}
+
+	`, packages, name, name, name, name, name, name)
 	return template.Must(template.New("goes.model").Parse(parsed))
 }
