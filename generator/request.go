@@ -13,7 +13,7 @@ import (
 type Request struct {
 }
 
-func (m *Request) Make(name string, dir string, packages string) error {
+func (m *Request) Make(name string, dir string, packages string, args ...string) error {
 	filename := fmt.Sprintf("%v.%v", goes.SnakeCase(name), "go")
 
 	os.Mkdir(dir, 0755)
@@ -33,7 +33,13 @@ func (m *Request) Make(name string, dir string, packages string) error {
 		CamelName: goes.CamelCase(name),
 	}
 
-	tmpl := m.getTemplate(name, packages)
+	var t = ""
+
+	if len(args) > 0 {
+		t = args[0]
+	}
+
+	tmpl := m.getTemplate(name, packages, t)
 	if err := tmpl.Execute(f, vars); err != nil {
 		return fmt.Errorf("Failed to execute tmpl: %w", err)
 	}
@@ -42,11 +48,14 @@ func (m *Request) Make(name string, dir string, packages string) error {
 	return nil
 }
 
-func (m *Request) getTemplate(name string, packages string) *template.Template {
+func (m *Request) getTemplate(name string, packages string, tmpl string) *template.Template {
 	var parsed = fmt.Sprintf(`package %v
 
 type %v struct {
 }
 	`, packages, name)
+	if tmpl != "" {
+		parsed = tmpl
+	}
 	return template.Must(template.New("goes.request").Parse(parsed))
 }

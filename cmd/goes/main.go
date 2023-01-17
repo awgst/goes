@@ -137,10 +137,19 @@ func getGenerator(generated string, name string, packages string) error {
 	case "response":
 		var responseGenerator generator.Response
 		gen = &responseGenerator
+	case "resources":
+		return generateFullResources(generated, name, packages)
 	}
 
 	dir := defaultPath + packages
 
 	err := gen.Make(name, dir, packages)
 	return err
+}
+
+func generateFullResources(generated string, name string, packages string) error {
+	var fullResourceGenerator generator.FullResource
+	gen := &fullResourceGenerator
+	dir := defaultPath
+	return gen.Make(name, dir, packages)
 }
