@@ -125,6 +125,9 @@ func getGenerator(generated string, name string, packages string) error {
 	case "controller":
 		var controllerGenerator generator.Controller
 		gen = &controllerGenerator
+	case "repository":
+		var repositoryGenerator generator.Repository
+		gen = &repositoryGenerator
 	}
 
 	dir := defaultPath + packages
