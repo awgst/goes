@@ -44,7 +44,7 @@ type %v struct {
 	db *gorm.DB
 }
 
-func New%v(db *gorm.Db) %vInterface {
+func New%v(db *gorm.DB) %vInterface {
 	return &%v{db:db}
 }
 
