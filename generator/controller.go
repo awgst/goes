@@ -43,13 +43,23 @@ func (c *Controller) Make(name string, dir string, packages string) error {
 }
 
 func (c *Controller) getTemplate(name string, packages string) *template.Template {
+	structName := goes.InitialLowerCase(name)
 	var parsed = fmt.Sprintf(`package %v
 
 import (
 	"github.com/gin-gonic/gin"
 )
 
+type %vInterface interface {
+	Index(c *gin.Context)
+	Show(c *gin.Context)
+}
+
 type %v struct {
+}
+
+func New%v() %vInterface {
+	return &%v{}
 }
 
 // Get resources list
@@ -77,6 +87,6 @@ func (ctr *%v) Delete(c *gin.Context) {
 	id := c.Param("id")
 }
 
-	`, packages, name, name, name, name, name, name)
+	`, packages, name, structName, name, name, structName, structName, structName, structName, structName, structName)
 	return template.Must(template.New("goes.model").Parse(parsed))
 }
