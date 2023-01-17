@@ -19,12 +19,12 @@ func (c *Controller) Make(name string, dir string, packages string) error {
 	os.Mkdir(dir, 0755)
 	path := filepath.Join(dir, filename)
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		return fmt.Errorf("File model is already exists : %v", err)
+		return fmt.Errorf("File controller is already exists : %v", err)
 	}
 
 	f, err := os.Create(path)
 	if err != nil {
-		return fmt.Errorf("Failed to create model file: %w", err)
+		return fmt.Errorf("Failed to create controller file: %w", err)
 	}
 	defer f.Close()
 
@@ -43,13 +43,23 @@ func (c *Controller) Make(name string, dir string, packages string) error {
 }
 
 func (c *Controller) getTemplate(name string, packages string) *template.Template {
+	structName := goes.InitialLowerCase(name)
 	var parsed = fmt.Sprintf(`package %v
 
 import (
 	"github.com/gin-gonic/gin"
 )
 
+type %vInterface interface {
+	Index(c *gin.Context)
+	Show(c *gin.Context)
+}
+
 type %v struct {
+}
+
+func New%v() %vInterface {
+	return &%v{}
 }
 
 // Get resources list
@@ -67,16 +77,16 @@ func (ctr *%v) Create(c *gin.Context) {
 
 }
 
-// UPdate resource
+// Update resource
 func (ctr *%v) Update(c *gin.Context) {
 	id := c.Param("id")
 }
 
-// Create resource
+// Delete resource
 func (ctr *%v) Delete(c *gin.Context) {
 	id := c.Param("id")
 }
 
-	`, packages, name, name, name, name, name, name)
-	return template.Must(template.New("goes.model").Parse(parsed))
+	`, packages, name, structName, name, name, structName, structName, structName, structName, structName, structName)
+	return template.Must(template.New("goes.controller").Parse(parsed))
 }

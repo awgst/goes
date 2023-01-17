@@ -67,6 +67,14 @@ func SnakeCase(str string) string {
 	return strings.ToLower(snake)
 }
 
+func InitialLowerCase(str string) string {
+	a := []rune(str)
+	a[0] = unicode.ToLower(a[0])
+	str = string(a)
+
+	return str
+}
+
 func isAlphaNum(r rune) bool {
 	return unicode.IsLetter(r) || unicode.IsNumber(r)
 }

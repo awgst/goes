@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMakeFunctionWillGenerateFile(t *testing.T) {
+func TestModelGeneratorMakeFunctionWillGenerateFile(t *testing.T) {
 	var modelGenerator generator.Model
 	tmpDir := t.TempDir()
 
