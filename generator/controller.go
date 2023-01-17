@@ -13,7 +13,7 @@ import (
 type Controller struct {
 }
 
-func (c *Controller) Make(name string, dir string, packages string) error {
+func (c *Controller) Make(name string, dir string, packages string, args ...string) error {
 	filename := fmt.Sprintf("%v.%v", goes.SnakeCase(name), "go")
 
 	os.Mkdir(dir, 0755)
@@ -33,7 +33,13 @@ func (c *Controller) Make(name string, dir string, packages string) error {
 		CamelName: goes.CamelCase(name),
 	}
 
-	tmpl := c.getTemplate(name, packages)
+	var t = ""
+
+	if len(args) > 0 {
+		t = args[0]
+	}
+
+	tmpl := c.getTemplate(name, packages, t)
 	if err := tmpl.Execute(f, vars); err != nil {
 		return fmt.Errorf("Failed to execute tmpl: %w", err)
 	}
@@ -42,7 +48,7 @@ func (c *Controller) Make(name string, dir string, packages string) error {
 	return nil
 }
 
-func (c *Controller) getTemplate(name string, packages string) *template.Template {
+func (c *Controller) getTemplate(name string, packages string, tmpl string) *template.Template {
 	structName := goes.InitialLowerCase(name)
 	var parsed = fmt.Sprintf(`package %v
 
@@ -88,5 +94,8 @@ func (ctr *%v) Delete(c *gin.Context) {
 }
 
 	`, packages, name, structName, name, name, structName, structName, structName, structName, structName, structName)
+	if tmpl != "" {
+		parsed = tmpl
+	}
 	return template.Must(template.New("goes.controller").Parse(parsed))
 }

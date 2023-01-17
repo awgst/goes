@@ -13,7 +13,7 @@ import (
 type Service struct {
 }
 
-func (c *Service) Make(name string, dir string, packages string) error {
+func (c *Service) Make(name string, dir string, packages string, args ...string) error {
 	filename := fmt.Sprintf("%v.%v", goes.SnakeCase(name), "go")
 
 	os.Mkdir(dir, 0755)
@@ -33,7 +33,13 @@ func (c *Service) Make(name string, dir string, packages string) error {
 		CamelName: goes.CamelCase(name),
 	}
 
-	tmpl := c.getTemplate(name, packages)
+	var t = ""
+
+	if len(args) > 0 {
+		t = args[0]
+	}
+
+	tmpl := c.getTemplate(name, packages, t)
 	if err := tmpl.Execute(f, vars); err != nil {
 		return fmt.Errorf("Failed to execute tmpl: %w", err)
 	}
@@ -42,7 +48,7 @@ func (c *Service) Make(name string, dir string, packages string) error {
 	return nil
 }
 
-func (c *Service) getTemplate(name string, packages string) *template.Template {
+func (c *Service) getTemplate(name string, packages string, tmpl string) *template.Template {
 	structName := goes.InitialLowerCase(name)
 	var parsed = fmt.Sprintf(`package %v
 
@@ -57,5 +63,10 @@ func New%v() %vInterface {
 }
 
 	`, packages, name, structName, name, name, structName)
+
+	if tmpl != "" {
+		parsed = tmpl
+	}
+
 	return template.Must(template.New("goes.service").Parse(parsed))
 }
